@@ -1,0 +1,8 @@
+이것은 테스트용 파일입니다.
+실제 운영에서는 이 위치에 PDF 파일들을 넣으시면 됩니다.
+
+예시:
+- hydrochloric-acid-35.pdf
+- sodium-hydroxide-45.pdf
+- ammonia-solution-25.pdf
+등등...

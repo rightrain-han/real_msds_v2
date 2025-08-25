@@ -1,0 +1,9 @@
+{
+  "framework": "nextjs",
+  "regions": ["icn1"],
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm run build",
+  "functions": {
+    "app/api/**/*.ts": { "maxDuration": 30 }
+  }
+}

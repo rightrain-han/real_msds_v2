@@ -1,0 +1,202 @@
+[
+  {
+    "id": 1,
+    "name": "염산 35%",
+    "pdfFileName": "HYDROCHLORIC_ACID.pdf",
+    "hazards": ["toxic", "corrosive"],
+    "usage": "순수시약",
+    "reception": ["LNG 3호기 CPP", "LNG 4호기 CPP", "수처리동"],
+    "laws": ["화학물질안전법", "산업안전보건법"],
+    "warningSymbols": ["corrosive", "toxic"]
+  },
+  {
+    "id": 2,
+    "name": "가성소다 45%",
+    "pdfFileName": "SODIUM_HYDROXIDE.pdf",
+    "hazards": ["corrosive"],
+    "usage": "순수시약",
+    "reception": ["LNG 3호기 CPP", "LNG 4호기 CPP", "수처리동"],
+    "laws": ["화학물질안전법", "산업안전보건법"],
+    "warningSymbols": ["corrosive"]
+  },
+  {
+    "id": 3,
+    "name": "암모니아수 25%",
+    "pdfFileName": "AMMONIA_SOLUTION.pdf",
+    "hazards": ["toxic", "corrosive"],
+    "usage": "NOx저감",
+    "reception": ["BIO 2호기 SCR", "LNG 4호기 SCR"],
+    "laws": ["화학물질안전법", "산업안전보건법"],
+    "warningSymbols": ["toxic", "corrosive", "environmental"]
+  },
+  {
+    "id": 4,
+    "name": "황산마그네슘 용액",
+    "pdfFileName": "MAGNESIUM_SULFATE.pdf",
+    "hazards": ["corrosive"],
+    "usage": "폐수처리",
+    "reception": ["수처리동"],
+    "laws": ["산업안전보건법"],
+    "warningSymbols": ["corrosive"]
+  },
+  {
+    "id": 5,
+    "name": "스케일방지제",
+    "pdfFileName": "SCALE_INHIBITOR.pdf",
+    "hazards": ["toxic", "corrosive"],
+    "usage": "순수시약",
+    "reception": ["수처리동"],
+    "laws": ["화학물질안전법", "산업안전보건법"],
+    "warningSymbols": ["toxic", "corrosive"]
+  },
+  {
+    "id": 6,
+    "name": "탈산소제",
+    "pdfFileName": "OXYGEN_SCAVENGER.pdf",
+    "hazards": ["toxic"],
+    "usage": "보일러용수처리",
+    "reception": ["발전소 보일러"],
+    "laws": ["산업안전보건법"],
+    "warningSymbols": ["toxic"]
+  },
+  {
+    "id": 7,
+    "name": "안티폼제제",
+    "pdfFileName": "ANTIFOAM.pdf",
+    "hazards": ["health_hazard"],
+    "usage": "과학물질분야",
+    "reception": ["발전소 보일러"],
+    "laws": ["산업안전보건법"],
+    "warningSymbols": ["health_hazard"]
+  },
+  {
+    "id": 8,
+    "name": "산동화제",
+    "pdfFileName": "OXIDIZER.pdf",
+    "hazards": ["oxidizing"],
+    "usage": "과학물질분야",
+    "reception": ["발전소 보일러"],
+    "laws": ["화학물질안전법", "산업안전보건법"],
+    "warningSymbols": ["oxidizing"]
+  },
+  {
+    "id": 9,
+    "name": "경유",
+    "pdfFileName": "DIESEL.pdf",
+    "hazards": ["flammable", "toxic", "health_hazard"],
+    "usage": "연료",
+    "reception": ["DO TANK"],
+    "laws": ["산업안전보건법"],
+    "warningSymbols": ["flammable", "toxic", "health_hazard"]
+  },
+  {
+    "id": 10,
+    "name": "이소시안산",
+    "pdfFileName": "ISOCYANIC_ACID.pdf",
+    "hazards": ["toxic"],
+    "usage": "소독용 가스",
+    "reception": ["발전소 보일러"],
+    "laws": ["산업안전보건법"],
+    "warningSymbols": ["toxic"]
+  },
+  {
+    "id": 11,
+    "name": "수소",
+    "pdfFileName": "HYDROGEN.pdf",
+    "hazards": ["flammable"],
+    "usage": "발전기 냉각",
+    "reception": ["LNG 보일러"],
+    "laws": ["산업안전보건법"],
+    "warningSymbols": ["flammable"]
+  },
+  {
+    "id": 12,
+    "name": "질소",
+    "pdfFileName": "NITROGEN.pdf",
+    "hazards": ["health_hazard"],
+    "usage": "Purge",
+    "reception": ["LNG 보일러"],
+    "laws": [],
+    "warningSymbols": ["health_hazard"]
+  },
+  {
+    "id": 13,
+    "name": "수용성 절연유",
+    "pdfFileName": "WATER_SOLUBLE_INSULATION.pdf",
+    "hazards": ["toxic"],
+    "usage": "절연",
+    "reception": ["발전소 보일러"],
+    "laws": [],
+    "warningSymbols": ["toxic"]
+  },
+  {
+    "id": 14,
+    "name": "금속 탈지 세정제",
+    "pdfFileName": "METAL_DEGREASER.pdf",
+    "hazards": ["toxic", "corrosive"],
+    "usage": "절연",
+    "reception": ["발전소 보일러"],
+    "laws": ["산업안전보건법"],
+    "warningSymbols": ["toxic", "corrosive"]
+  },
+  {
+    "id": 15,
+    "name": "디젤로 세정제",
+    "pdfFileName": "DIESEL_CLEANER.pdf",
+    "hazards": ["flammable", "toxic"],
+    "usage": "절연",
+    "reception": ["발전소 보일러"],
+    "laws": ["산업안전보건법"],
+    "warningSymbols": ["flammable", "toxic"]
+  },
+  {
+    "id": 16,
+    "name": "Citric Acid",
+    "pdfFileName": "CITRIC_ACID.pdf",
+    "hazards": ["corrosive"],
+    "usage": "세정제",
+    "reception": ["수처리동"],
+    "laws": [],
+    "warningSymbols": ["corrosive"]
+  },
+  {
+    "id": 17,
+    "name": "천연가스(LNG)",
+    "pdfFileName": "LNG.pdf",
+    "hazards": ["flammable"],
+    "usage": "연료",
+    "reception": ["발전소 보일러"],
+    "laws": ["산업안전보건법"],
+    "warningSymbols": ["flammable"]
+  },
+  {
+    "id": 18,
+    "name": "예비석유가스",
+    "pdfFileName": "BACKUP_GAS.pdf",
+    "hazards": ["flammable", "toxic"],
+    "usage": "절연",
+    "reception": ["발전소 보일러"],
+    "laws": ["산업안전보건법"],
+    "warningSymbols": ["flammable", "toxic"]
+  },
+  {
+    "id": 19,
+    "name": "브로모메틸 청산",
+    "pdfFileName": "BROMOMETHYL_ACID.pdf",
+    "hazards": [],
+    "usage": "세정제",
+    "reception": ["수처리동"],
+    "laws": [],
+    "warningSymbols": []
+  },
+  {
+    "id": 20,
+    "name": "Buffer solution pH 4.00",
+    "pdfFileName": "BUFFER_SOLUTION_PH4.pdf",
+    "hazards": [],
+    "usage": "세정제",
+    "reception": ["수처리동"],
+    "laws": ["산업안전보건법"],
+    "warningSymbols": []
+  }
+]
