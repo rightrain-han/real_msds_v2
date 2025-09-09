@@ -10,12 +10,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Edit, Trash2, Upload, QrCode, LogOut } from "lucide-react"
+import { Plus, Edit, Trash2, Upload, QrCode, LogOut, AlertTriangle, Shield } from "lucide-react"
 import Link from "next/link"
 import type { MsdsItem, WarningSymbol, ProtectiveEquipment } from "./types/msds"
 import { QRPrintModal } from "./components/qr-print-modal"
 import { ImageUpload } from "./components/image-upload"
 import { UploadStatusInfo } from "./components/upload-status-info"
+import { WarningSymbolComponent } from "./components/warning-symbol"
+import { ProtectiveEquipmentComponent } from "./components/protective-equipment"
 
 interface AdminDashboardProps {
   onLogout?: () => void
@@ -701,9 +703,41 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                 {item.usage}
                               </Badge>
                               {item.pdfFileName && <Badge variant="outline">PDF: {item.pdfFileName}</Badge>}
-                              <Badge variant="outline">경고표지: {item.warningSymbols?.length || 0}개</Badge>
-                              <Badge variant="outline">보호장구: {item.hazards?.length || 0}개</Badge>
                             </div>
+                            
+                            {/* 경고표지 이미지 표시 */}
+                            {item.warningSymbolsData && item.warningSymbolsData.length > 0 && (
+                              <div className="mt-3">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <AlertTriangle className="h-4 w-4 text-orange-500" />
+                                  <span className="text-sm font-medium text-gray-700">경고 표지</span>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                  {item.warningSymbolsData.map((symbol) => (
+                                    <div key={symbol.id} className="transform hover:scale-110 transition-transform">
+                                      <WarningSymbolComponent symbol={symbol} size="sm" showTooltip={true} />
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* 보호장구 이미지 표시 */}
+                            {item.protectiveEquipmentData && item.protectiveEquipmentData.length > 0 && (
+                              <div className="mt-3">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Shield className="h-4 w-4 text-green-500" />
+                                  <span className="text-sm font-medium text-gray-700">보호 장구</span>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                  {item.protectiveEquipmentData.map((equipment) => (
+                                    <div key={equipment.id} className="transform hover:scale-110 transition-transform">
+                                      <ProtectiveEquipmentComponent equipment={equipment} size="sm" showTooltip={true} />
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                             <div className="mt-2 text-sm text-gray-600">
                               <p>장소: {item.reception.join(", ")}</p>
                               <p>관련법: {item.laws.join(", ")}</p>
