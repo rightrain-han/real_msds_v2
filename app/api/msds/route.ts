@@ -73,6 +73,7 @@ export async function GET() {
 
       return {
         id: item.id,
+        msdsCode: item.msds_code || `M${item.id.toString().padStart(4, '0')}`,
         name: item.name,
         pdfFileName: item.pdf_file_name || "",
         pdfUrl: item.pdf_file_url || "",

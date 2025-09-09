@@ -489,9 +489,16 @@ export default function MsdsDashboard() {
                   {/* Header with MSDS Name and PDF Status */}
                   <div className="mb-4">
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 flex-1">
-                        {item.name}
-                      </h3>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs font-mono bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                            {item.msdsCode || `M${item.id.toString().padStart(4, '0')}`}
+                          </span>
+                        </div>
+                        <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
+                          {item.name}
+                        </h3>
+                      </div>
                       {item.pdfFileName ? (
                         <div className="ml-2 flex-shrink-0 flex items-center gap-1">
                           <div className="w-3 h-3 bg-green-500 rounded-full" title="PDF 문서 있음"></div>

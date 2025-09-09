@@ -690,6 +690,11 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           className={`flex ${isMobile ? "flex-col gap-3" : "flex-col md:flex-row md:items-center justify-between gap-4"}`}
                         >
                           <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-mono bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                {item.msdsCode || `M${item.id.toString().padStart(4, '0')}`}
+                              </span>
+                            </div>
                             <h3 className="font-medium text-lg">{item.name}</h3>
                             <div className="flex flex-wrap gap-2 mt-2">
                               <Badge variant="secondary" className="bg-blue-500 text-white">

@@ -1,5 +1,6 @@
 export interface MsdsItem {
   id: number
+  msdsCode?: string
   name: string
   casNo?: string
   pdfFileName: string
