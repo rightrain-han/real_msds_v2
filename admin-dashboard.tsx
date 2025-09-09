@@ -103,6 +103,10 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     label: "",
   })
 
+  // 페이지네이션 상태
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
+
   // 모바일 감지
   useEffect(() => {
     const checkMobile = () => {
@@ -578,6 +582,21 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const getReceptionOptions = () => configOptions.filter((opt) => opt.type === "reception")
   const getLawOptions = () => configOptions.filter((opt) => opt.type === "laws")
 
+  // 페이지네이션 로직
+  const totalPages = Math.ceil(msdsItems.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const currentItems = msdsItems.slice(startIndex, endIndex)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  const handleItemsPerPageChange = (value: string) => {
+    setItemsPerPage(Number(value))
+    setCurrentPage(1) // 페이지 크기 변경 시 첫 페이지로 이동
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -662,7 +681,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {msdsItems.map((item) => (
+                    {currentItems.map((item) => (
                       <div
                         key={item.id}
                         className={`border border-gray-200 rounded-lg p-4 ${isMobile ? "space-y-4" : ""}`}
@@ -749,6 +768,81 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <div className="text-center py-8 text-gray-500">
                         <p>등록된 MSDS 항목이 없습니다.</p>
                         <p className="text-sm mt-1">새 항목을 추가해보세요.</p>
+                      </div>
+                    )}
+
+                    {/* 페이지네이션 컨트롤 */}
+                    {msdsItems.length > 0 && (
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-gray-200">
+                        {/* 페이지 크기 선택 */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600">페이지당 항목 수:</span>
+                          <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
+                            <SelectTrigger className="w-20">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="5">5</SelectItem>
+                              <SelectItem value="10">10</SelectItem>
+                              <SelectItem value="20">20</SelectItem>
+                              <SelectItem value="50">50</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* 페이지 정보 */}
+                        <div className="text-sm text-gray-600">
+                          {startIndex + 1}-{Math.min(endIndex, msdsItems.length)} / {msdsItems.length} 항목
+                        </div>
+
+                        {/* 페이지 네비게이션 */}
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                          >
+                            이전
+                          </Button>
+                          
+                          {/* 페이지 번호들 */}
+                          <div className="flex items-center gap-1">
+                            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                              let pageNum
+                              if (totalPages <= 5) {
+                                pageNum = i + 1
+                              } else if (currentPage <= 3) {
+                                pageNum = i + 1
+                              } else if (currentPage >= totalPages - 2) {
+                                pageNum = totalPages - 4 + i
+                              } else {
+                                pageNum = currentPage - 2 + i
+                              }
+                              
+                              return (
+                                <Button
+                                  key={pageNum}
+                                  variant={currentPage === pageNum ? "default" : "outline"}
+                                  size="sm"
+                                  onClick={() => handlePageChange(pageNum)}
+                                  className="w-8 h-8 p-0"
+                                >
+                                  {pageNum}
+                                </Button>
+                              )
+                            })}
+                          </div>
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                          >
+                            다음
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </div>
