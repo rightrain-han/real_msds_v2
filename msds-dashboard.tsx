@@ -538,16 +538,11 @@ export default function MsdsDashboard() {
                         <span className="text-sm font-medium text-gray-700">경고 표지</span>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        {item.warningSymbolsData.slice(0, 4).map((symbol) => (
+                        {item.warningSymbolsData.map((symbol) => (
                           <div key={symbol.id} className="transform hover:scale-110 transition-transform">
                             <WarningSymbolComponent symbol={symbol} size="sm" showTooltip={true} />
                           </div>
                         ))}
-                        {item.warningSymbolsData.length > 4 && (
-                          <div className="flex items-center justify-center w-8 h-8 bg-gray-100 rounded text-xs text-gray-500 font-medium">
-                            +{item.warningSymbolsData.length - 4}
-                          </div>
-                        )}
                       </div>
                     </div>
                   )}
@@ -560,16 +555,11 @@ export default function MsdsDashboard() {
                         <span className="text-sm font-medium text-gray-700">보호 장구</span>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        {item.protectiveEquipmentData.slice(0, 4).map((equipment) => (
+                        {item.protectiveEquipmentData.map((equipment) => (
                           <div key={equipment.id} className="transform hover:scale-110 transition-transform">
                             <ProtectiveEquipmentComponent equipment={equipment} size="sm" showTooltip={true} />
                           </div>
                         ))}
-                        {item.protectiveEquipmentData.length > 4 && (
-                          <div className="flex items-center justify-center w-6 h-6 bg-gray-100 rounded text-xs text-gray-500 font-medium">
-                            +{item.protectiveEquipmentData.length - 4}
-                          </div>
-                        )}
                       </div>
                     </div>
                   )}
