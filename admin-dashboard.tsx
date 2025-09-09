@@ -705,39 +705,47 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                               {item.pdfFileName && <Badge variant="outline">PDF: {item.pdfFileName}</Badge>}
                             </div>
                             
-                            {/* 경고표지 이미지 표시 */}
-                            {item.warningSymbolsData && item.warningSymbolsData.length > 0 && (
+                            {/* 경고표지와 보호장구를 같은 줄에 표시 */}
+                            {(item.warningSymbolsData && item.warningSymbolsData.length > 0) || 
+                             (item.protectiveEquipmentData && item.protectiveEquipmentData.length > 0) ? (
                               <div className="mt-3">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <AlertTriangle className="h-4 w-4 text-orange-500" />
-                                  <span className="text-sm font-medium text-gray-700">경고 표지</span>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                  {item.warningSymbolsData.map((symbol) => (
-                                    <div key={symbol.id} className="transform hover:scale-110 transition-transform">
-                                      <WarningSymbolComponent symbol={symbol} size="sm" showTooltip={true} />
+                                <div className={`flex ${isMobile ? "flex-col gap-2" : "items-center gap-4"}`}>
+                                  {/* 경고표지 섹션 */}
+                                  {item.warningSymbolsData && item.warningSymbolsData.length > 0 && (
+                                    <div className="flex items-center gap-2">
+                                      <div className="flex items-center gap-1">
+                                        <AlertTriangle className="h-3 w-3 text-orange-500" />
+                                        <span className="text-xs font-medium text-gray-600">경고</span>
+                                      </div>
+                                      <div className="flex gap-1">
+                                        {item.warningSymbolsData.map((symbol) => (
+                                          <div key={symbol.id} className="transform hover:scale-110 transition-transform">
+                                            <WarningSymbolComponent symbol={symbol} size="sm" showTooltip={true} />
+                                          </div>
+                                        ))}
+                                      </div>
                                     </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
+                                  )}
 
-                            {/* 보호장구 이미지 표시 */}
-                            {item.protectiveEquipmentData && item.protectiveEquipmentData.length > 0 && (
-                              <div className="mt-3">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <Shield className="h-4 w-4 text-green-500" />
-                                  <span className="text-sm font-medium text-gray-700">보호 장구</span>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                  {item.protectiveEquipmentData.map((equipment) => (
-                                    <div key={equipment.id} className="transform hover:scale-110 transition-transform">
-                                      <ProtectiveEquipmentComponent equipment={equipment} size="sm" showTooltip={true} />
+                                  {/* 보호장구 섹션 */}
+                                  {item.protectiveEquipmentData && item.protectiveEquipmentData.length > 0 && (
+                                    <div className="flex items-center gap-2">
+                                      <div className="flex items-center gap-1">
+                                        <Shield className="h-3 w-3 text-green-500" />
+                                        <span className="text-xs font-medium text-gray-600">보호</span>
+                                      </div>
+                                      <div className="flex gap-1">
+                                        {item.protectiveEquipmentData.map((equipment) => (
+                                          <div key={equipment.id} className="transform hover:scale-110 transition-transform">
+                                            <ProtectiveEquipmentComponent equipment={equipment} size="sm" showTooltip={true} />
+                                          </div>
+                                        ))}
+                                      </div>
                                     </div>
-                                  ))}
+                                  )}
                                 </div>
                               </div>
-                            )}
+                            ) : null}
                             <div className="mt-2 text-sm text-gray-600">
                               <p>장소: {item.reception.join(", ")}</p>
                               <p>관련법: {item.laws.join(", ")}</p>
