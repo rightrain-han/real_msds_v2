@@ -1,26 +1,43 @@
-"use client"
+/**
+ * 검색 바 컴포넌트
+ */
 
-import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
+import React from 'react'
+import { Search, X } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { MESSAGES } from '@/lib/constants'
 
 interface SearchBarProps {
-  value: string
-  onChange: (value: string) => void
-  placeholder?: string
-  className?: string
+  searchQuery: string
+  onSearchChange: (query: string) => void
+  onClearSearch: () => void
+  isMobile: boolean
 }
 
-export default function SearchBar({ value, onChange, placeholder = "검색...", className }: SearchBarProps) {
+export function SearchBar({ searchQuery, onSearchChange, onClearSearch, isMobile }: SearchBarProps) {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onSearchChange(e.target.value)
+  }
+
   return (
-    <div className={`relative ${className}`}>
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+    <div className="relative max-w-2xl mx-auto">
+      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <Search className="h-5 w-5 text-gray-400" />
+      </div>
       <Input
-        type="text"
-        placeholder={placeholder}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="pl-10 pr-4 py-2 w-full"
+        placeholder={MESSAGES.SEARCH_PLACEHOLDER}
+        className={`w-full pl-10 pr-10 ${isMobile ? 'py-4 text-base' : 'py-3'} bg-white/95 backdrop-blur-sm border-white/30 text-gray-900 placeholder-gray-500 rounded-xl shadow-lg focus:ring-2 focus:ring-white/50`}
+        value={searchQuery}
+        onChange={handleInputChange}
       />
+      {searchQuery && (
+        <button
+          onClick={onClearSearch}
+          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+        >
+          <X className="h-5 w-5" />
+        </button>
+      )}
     </div>
   )
 }
