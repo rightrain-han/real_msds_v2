@@ -1,7 +1,5 @@
-"use client"
+import MsdsDashboard from "../msds-dashboard"
 
-import MsdsDashboard from "@/msds-dashboard"
-
-export default function HomePage() {
+export default function Page() {
   return <MsdsDashboard />
 }

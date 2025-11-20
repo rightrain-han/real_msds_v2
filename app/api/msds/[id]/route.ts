@@ -4,10 +4,6 @@ import { createAdminClient } from "@/lib/supabase-admin"
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = createAdminClient()
-    if (!supabase) {
-      return NextResponse.json({ error: "Supabase not available" }, { status: 500 })
-    }
-
     const id = Number.parseInt(params.id)
 
     // MSDS 기본 정보 조회
@@ -60,10 +56,6 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = createAdminClient()
-    if (!supabase) {
-      return NextResponse.json({ error: "Supabase not available" }, { status: 500 })
-    }
-
     const id = Number.parseInt(params.id)
     const body = await request.json()
 
@@ -108,12 +100,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       await supabase.from("msds_protective_equipment").insert(equipmentInserts)
     }
 
-    const configInserts: Array<{
-      msds_id: number
-      config_type: string
-      config_value: string
-    }> = []
-
+    const configInserts = []
     if (body.reception && body.reception.length > 0) {
       body.reception.forEach((value: string) => {
         configInserts.push({
@@ -148,10 +135,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = createAdminClient()
-    if (!supabase) {
-      return NextResponse.json({ error: "Supabase not available" }, { status: 500 })
-    }
-
     const id = Number.parseInt(params.id)
 
     // CASCADE 설정으로 인해 관련 데이터는 자동 삭제됨

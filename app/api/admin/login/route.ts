@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 
 // 초기 관리자 암호 (실제 운영에서는 환경변수나 데이터베이스에 저장)
-const ADMIN_PASSWORD = "0000"
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "0000"
 
 // 세션 만료 시간 (24시간)
 const SESSION_DURATION = 24 * 60 * 60 * 1000

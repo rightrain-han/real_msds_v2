@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { RefreshCw, AlertTriangle, Settings, Copy, Eye, EyeOff, Wifi, WifiOff } from "lucide-react"
+import { RefreshCw, CheckCircle, XCircle, AlertTriangle, Settings, Copy, Eye, EyeOff } from "lucide-react"
 
 /**
  * 연결 테스트 결과 인터페이스
@@ -94,12 +94,7 @@ export function ConnectionStatus() {
       checkConnection()
     }, 1000)
 
-    const interval = setInterval(checkConnection, 30000)
-
-    return () => {
-      clearTimeout(timer)
-      clearInterval(interval)
-    }
+    return () => clearTimeout(timer)
   }, [])
 
   /**
@@ -110,9 +105,9 @@ export function ConnectionStatus() {
       return <RefreshCw className="h-4 w-4 animate-spin text-blue-500" />
     }
     if (connectionStatus.connected) {
-      return <Wifi className="h-4 w-4 text-green-500" />
+      return <CheckCircle className="h-4 w-4 text-green-500" />
     }
-    return <WifiOff className="h-4 w-4 text-red-500" />
+    return <XCircle className="h-4 w-4 text-red-500" />
   }
 
   /**
@@ -120,23 +115,18 @@ export function ConnectionStatus() {
    */
   const getStatusBadge = () => {
     if (connectionStatus.loading) {
-      return (
-        <Badge variant="secondary" className="animate-pulse">
-          <div className="w-4 h-4 mr-2 bg-gray-400 rounded-full"></div>
-          연결 확인 중...
-        </Badge>
-      )
+      return <Badge variant="secondary">연결 확인 중...</Badge>
     }
     if (connectionStatus.connected) {
       return (
-        <Badge variant="default" className="bg-green-100 text-green-800 bg-opacity-90">
-          데이터베이스 연결됨
+        <Badge variant="secondary" className="bg-green-100 text-green-800">
+          연결됨
         </Badge>
       )
     }
     return (
-      <Badge variant="destructive" className="bg-red-100 text-red-800 bg-opacity-90">
-        데이터베이스 연결 실패
+      <Badge variant="secondary" className="bg-red-100 text-red-800">
+        연결 실패
       </Badge>
     )
   }

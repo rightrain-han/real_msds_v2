@@ -1,10 +1,10 @@
 "use client"
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import type { MsdsItem } from "@/types/msds"
+import type { MSDSItem } from "@/types/msds"
 
 export interface MsdsTableProps {
-  msdsItems: MsdsItem[]
+  msdsItems: MSDSItem[]
 }
 
 export default function MsdsTable({ msdsItems = [] }: MsdsTableProps) {

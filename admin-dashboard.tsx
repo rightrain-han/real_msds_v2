@@ -10,14 +10,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Edit, Trash2, Upload, QrCode, LogOut, AlertTriangle, Shield } from "lucide-react"
+import { RefreshCw, Plus, Edit, Trash2, Upload, QrCode, LogOut } from "lucide-react"
 import Link from "next/link"
 import type { MsdsItem, WarningSymbol, ProtectiveEquipment } from "./types/msds"
 import { QRPrintModal } from "./components/qr-print-modal"
 import { ImageUpload } from "./components/image-upload"
 import { UploadStatusInfo } from "./components/upload-status-info"
-import { WarningSymbolComponent } from "./components/warning-symbol"
-import { ProtectiveEquipmentComponent } from "./components/protective-equipment"
 
 interface AdminDashboardProps {
   onLogout?: () => void
@@ -57,6 +55,7 @@ const initialFormData: FormData = {
 export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [msdsItems, setMsdsItems] = useState<MsdsItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [editingItem, setEditingItem] = useState<MsdsItem | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
   const [formData, setFormData] = useState<FormData>(initialFormData)
@@ -105,10 +104,6 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
     label: "",
   })
 
-  // 페이지네이션 상태
-  const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage, setItemsPerPage] = useState(10)
-
   // 모바일 감지
   useEffect(() => {
     const checkMobile = () => {
@@ -126,6 +121,14 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
   const loadAllData = async () => {
     await Promise.all([loadMsdsItems(), loadWarningSymbols(), loadProtectiveEquipment(), loadConfigOptions()])
+  }
+
+  // 수동 새로고침 함수
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    await loadAllData()
+    setRefreshing(false)
+    showMessage("success", "데이터가 새로고침되었습니다.")
   }
 
   // 로그아웃 처리
@@ -584,40 +587,32 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const getReceptionOptions = () => configOptions.filter((opt) => opt.type === "reception")
   const getLawOptions = () => configOptions.filter((opt) => opt.type === "laws")
 
-  // 페이지네이션 로직
-  const totalPages = Math.ceil(msdsItems.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const currentItems = msdsItems.slice(startIndex, endIndex)
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-  }
-
-  const handleItemsPerPageChange = (value: string) => {
-    setItemsPerPage(Number(value))
-    setCurrentPage(1) // 페이지 크기 변경 시 첫 페이지로 이동
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-4 md:px-6 py-4">
-        <div className="flex items-center justify-between">
-          <h1 className={`${isMobile ? "text-xl" : "text-xl md:text-2xl"} font-bold text-gray-900`}>MSDS 관리자</h1>
-
-          <div className="flex items-center gap-2">
-            <Link href="/">
-              <Button variant="outline" size="sm" className="text-xs px-2 py-1">
-                메인으로
-              </Button>
-            </Link>
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <h1 className={`${isMobile ? "text-xl" : "text-xl md:text-2xl"} font-bold text-gray-900`}>MSDS 관리자</h1>
             {onLogout && (
               <Button onClick={handleLogout} variant="outline" size="sm" className={isMobile ? "px-3" : ""}>
                 <LogOut className="h-4 w-4 mr-2" />
                 로그아웃
               </Button>
             )}
+          </div>
+
+          {/* 모바일에서는 버튼들을 세로로 배치 */}
+          <div className={`flex ${isMobile ? "flex-col gap-2" : "flex-wrap gap-2"}`}>
+            <Button onClick={handleRefresh} variant="outline" size="sm" disabled={refreshing} className="flex-1">
+              <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
+              새로고침
+            </Button>
+            <Link href="/" className="flex-1">
+              <Button variant="secondary" size="sm" className="w-full">
+                메인으로
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
@@ -678,12 +673,12 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
               <CardContent>
                 {loading ? (
                   <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-200 border-t-blue-600 mx-auto mb-2"></div>
+                    <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-2 text-blue-600" />
                     <p>데이터를 불러오는 중...</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {currentItems.map((item) => (
+                    {msdsItems.map((item) => (
                       <div
                         key={item.id}
                         className={`border border-gray-200 rounded-lg p-4 ${isMobile ? "space-y-4" : ""}`}
@@ -692,60 +687,15 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                           className={`flex ${isMobile ? "flex-col gap-3" : "flex-col md:flex-row md:items-center justify-between gap-4"}`}
                         >
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs font-mono bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                {item.msdsCode || `M${item.id.toString().padStart(4, '0')}`}
-                              </span>
-                            </div>
                             <h3 className="font-medium text-lg">{item.name}</h3>
                             <div className="flex flex-wrap gap-2 mt-2">
                               <Badge variant="secondary" className="bg-blue-500 text-white">
                                 {item.usage}
                               </Badge>
                               {item.pdfFileName && <Badge variant="outline">PDF: {item.pdfFileName}</Badge>}
+                              <Badge variant="outline">경고표지: {item.warningSymbols?.length || 0}개</Badge>
+                              <Badge variant="outline">보호장구: {item.hazards?.length || 0}개</Badge>
                             </div>
-                            
-                            {/* 경고표지와 보호장구를 같은 줄에 표시 */}
-                            {(item.warningSymbolsData && item.warningSymbolsData.length > 0) || 
-                             (item.protectiveEquipmentData && item.protectiveEquipmentData.length > 0) ? (
-                              <div className="mt-3">
-                                <div className={`flex ${isMobile ? "flex-col gap-2" : "items-center gap-4"}`}>
-                                  {/* 경고표지 섹션 */}
-                                  {item.warningSymbolsData && item.warningSymbolsData.length > 0 && (
-                                    <div className="flex items-center gap-2">
-                                      <div className="flex items-center gap-1">
-                                        <AlertTriangle className="h-3 w-3 text-orange-500" />
-                                        <span className="text-xs font-medium text-gray-600">경고</span>
-                                      </div>
-                                      <div className="flex gap-1">
-                                        {item.warningSymbolsData.map((symbol) => (
-                                          <div key={symbol.id} className="transform hover:scale-110 transition-transform">
-                                            <WarningSymbolComponent symbol={symbol} size="sm" showTooltip={true} />
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {/* 보호장구 섹션 */}
-                                  {item.protectiveEquipmentData && item.protectiveEquipmentData.length > 0 && (
-                                    <div className="flex items-center gap-2">
-                                      <div className="flex items-center gap-1">
-                                        <Shield className="h-3 w-3 text-green-500" />
-                                        <span className="text-xs font-medium text-gray-600">보호</span>
-                                      </div>
-                                      <div className="flex gap-1">
-                                        {item.protectiveEquipmentData.map((equipment) => (
-                                          <div key={equipment.id} className="transform hover:scale-110 transition-transform">
-                                            <ProtectiveEquipmentComponent equipment={equipment} size="sm" showTooltip={true} />
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            ) : null}
                             <div className="mt-2 text-sm text-gray-600">
                               <p>장소: {item.reception.join(", ")}</p>
                               <p>관련법: {item.laws.join(", ")}</p>
@@ -815,81 +765,6 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       <div className="text-center py-8 text-gray-500">
                         <p>등록된 MSDS 항목이 없습니다.</p>
                         <p className="text-sm mt-1">새 항목을 추가해보세요.</p>
-                      </div>
-                    )}
-
-                    {/* 페이지네이션 컨트롤 */}
-                    {msdsItems.length > 0 && (
-                      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-gray-200">
-                        {/* 페이지 크기 선택 */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-600">페이지당 항목 수:</span>
-                          <Select value={itemsPerPage.toString()} onValueChange={handleItemsPerPageChange}>
-                            <SelectTrigger className="w-20">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="5">5</SelectItem>
-                              <SelectItem value="10">10</SelectItem>
-                              <SelectItem value="20">20</SelectItem>
-                              <SelectItem value="50">50</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        {/* 페이지 정보 */}
-                        <div className="text-sm text-gray-600">
-                          {startIndex + 1}-{Math.min(endIndex, msdsItems.length)} / {msdsItems.length} 항목
-                        </div>
-
-                        {/* 페이지 네비게이션 */}
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1}
-                          >
-                            이전
-                          </Button>
-                          
-                          {/* 페이지 번호들 */}
-                          <div className="flex items-center gap-1">
-                            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                              let pageNum
-                              if (totalPages <= 5) {
-                                pageNum = i + 1
-                              } else if (currentPage <= 3) {
-                                pageNum = i + 1
-                              } else if (currentPage >= totalPages - 2) {
-                                pageNum = totalPages - 4 + i
-                              } else {
-                                pageNum = currentPage - 2 + i
-                              }
-                              
-                              return (
-                                <Button
-                                  key={pageNum}
-                                  variant={currentPage === pageNum ? "default" : "outline"}
-                                  size="sm"
-                                  onClick={() => handlePageChange(pageNum)}
-                                  className="w-8 h-8 p-0"
-                                >
-                                  {pageNum}
-                                </Button>
-                              )
-                            })}
-                          </div>
-
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                          >
-                            다음
-                          </Button>
-                        </div>
                       </div>
                     )}
                   </div>

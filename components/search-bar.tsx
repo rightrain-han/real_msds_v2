@@ -1,43 +1,45 @@
-/**
- * 검색 바 컴포넌트
- */
+"use client"
 
-import React from 'react'
-import { Search, X } from 'lucide-react'
-import { Input } from '@/components/ui/input'
-import { MESSAGES } from '@/lib/constants'
+import { useState, type ChangeEvent, type FormEvent } from "react"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Search } from "lucide-react"
 
-interface SearchBarProps {
-  searchQuery: string
-  onSearchChange: (query: string) => void
-  onClearSearch: () => void
-  isMobile: boolean
+export interface SearchBarProps {
+  onSearch: (term: string) => void
+  placeholder?: string
 }
 
-export function SearchBar({ searchQuery, onSearchChange, onClearSearch, isMobile }: SearchBarProps) {
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSearchChange(e.target.value)
+export default function SearchBar({ onSearch, placeholder = "Search…" }: SearchBarProps) {
+  const [value, setValue] = useState("")
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value)
+  }
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault()
+    onSearch(value.trim())
   }
 
   return (
-    <div className="relative max-w-2xl mx-auto">
-      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <Search className="h-5 w-5 text-gray-400" />
-      </div>
+    <form onSubmit={handleSubmit} className="flex w-full max-w-xs gap-2">
       <Input
-        placeholder={MESSAGES.SEARCH_PLACEHOLDER}
-        className={`w-full pl-10 pr-10 ${isMobile ? 'py-4 text-base' : 'py-3'} bg-white/95 backdrop-blur-sm border-white/30 text-gray-900 placeholder-gray-500 rounded-xl shadow-lg focus:ring-2 focus:ring-white/50`}
-        value={searchQuery}
-        onChange={handleInputChange}
+        value={value}
+        onChange={handleChange}
+        placeholder={placeholder}
+        className="flex-1"
+        aria-label="Search MSDS"
       />
-      {searchQuery && (
-        <button
-          onClick={onClearSearch}
-          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-        >
-          <X className="h-5 w-5" />
-        </button>
-      )}
-    </div>
+      <Button
+        type="submit"
+        size="icon"
+        variant="outline"
+        className="bg-neutral-100 text-neutral-800"
+        aria-label="Submit search"
+      >
+        <Search className="h-4 w-4" />
+      </Button>
+    </form>
   )
 }

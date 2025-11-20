@@ -2,7 +2,6 @@ import { NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase-admin"
 // JSON 파일을 정적 import 하면 Next.js가 번들에 포함합니다.
 import localMsdsData from "@/public/data/msds-data.json"
-import type { MsdsItem } from "@/types/msds"
 
 export async function GET() {
   try {
@@ -35,17 +34,17 @@ export async function GET() {
     const protectiveEquipment = protectiveEquipmentResponse.data || []
 
     // 데이터 매핑 및 변환
-    const enrichedItems: MsdsItem[] = msdsItems.map((item) => {
+    const enrichedItems = msdsItems.map((item) => {
       // 경고 표지 ID 배열 생성
-      const warningSymbolIds = item.msds_warning_symbols?.map((ws: any) => ws.warning_symbol_id) || []
+      const warningSymbolIds = item.msds_warning_symbols?.map((ws) => ws.warning_symbol_id) || []
 
       // 보호 장구 ID 배열 생성
-      const protectiveEquipmentIds = item.msds_protective_equipment?.map((pe: any) => pe.protective_equipment_id) || []
+      const protectiveEquipmentIds = item.msds_protective_equipment?.map((pe) => pe.protective_equipment_id) || []
 
       // 설정 항목 분류
       const configItems = item.msds_config_items || []
-      const reception = configItems.filter((c: any) => c.config_type === "reception").map((c: any) => c.config_value)
-      const laws = configItems.filter((c: any) => c.config_type === "laws").map((c: any) => c.config_value)
+      const reception = configItems.filter((c) => c.config_type === "reception").map((c) => c.config_value)
+      const laws = configItems.filter((c) => c.config_type === "laws").map((c) => c.config_value)
 
       // 실제 경고 표지 데이터 매핑
       const warningSymbolsData = warningSymbols
@@ -73,7 +72,6 @@ export async function GET() {
 
       return {
         id: item.id,
-        msdsCode: item.msds_code || `M${item.id.toString().padStart(4, '0')}`,
         name: item.name,
         pdfFileName: item.pdf_file_name || "",
         pdfUrl: item.pdf_file_url || "",
@@ -95,7 +93,7 @@ export async function GET() {
     console.warn("MSDS API fallback → static json", err)
 
     // 폴백 데이터에도 빈 배열로 초기화하여 에러 방지
-    const fallbackData: MsdsItem[] = localMsdsData.map((item) => ({
+    const fallbackData = localMsdsData.map((item) => ({
       ...item,
       warningSymbolsData: [],
       protectiveEquipmentData: [],
@@ -128,7 +126,7 @@ export async function POST(request: Request) {
 
     // 경고 표지 연결
     if (body.warningSymbols && body.warningSymbols.length > 0) {
-      const warningSymbolInserts = body.warningSymbols.map((symbolId: string) => ({
+      const warningSymbolInserts = body.warningSymbols.map((symbolId) => ({
         msds_id: msdsItem.id,
         warning_symbol_id: symbolId,
       }))
@@ -138,7 +136,7 @@ export async function POST(request: Request) {
 
     // 보호 장구 연결
     if (body.hazards && body.hazards.length > 0) {
-      const protectiveEquipmentInserts = body.hazards.map((equipmentId: string) => ({
+      const protectiveEquipmentInserts = body.hazards.map((equipmentId) => ({
         msds_id: msdsItem.id,
         protective_equipment_id: equipmentId,
       }))
@@ -147,14 +145,10 @@ export async function POST(request: Request) {
     }
 
     // 설정 항목 연결
-    const configInserts: Array<{
-      msds_id: number
-      config_type: string
-      config_value: string
-    }> = []
+    const configInserts = []
 
     if (body.reception && body.reception.length > 0) {
-      body.reception.forEach((value: string) => {
+      body.reception.forEach((value) => {
         configInserts.push({
           msds_id: msdsItem.id,
           config_type: "reception",
@@ -164,7 +158,7 @@ export async function POST(request: Request) {
     }
 
     if (body.laws && body.laws.length > 0) {
-      body.laws.forEach((value: string) => {
+      body.laws.forEach((value) => {
         configInserts.push({
           msds_id: msdsItem.id,
           config_type: "laws",

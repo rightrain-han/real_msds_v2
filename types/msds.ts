@@ -1,8 +1,6 @@
 export interface MsdsItem {
   id: number
-  msdsCode?: string
   name: string
-  casNo?: string
   pdfFileName: string
   pdfUrl?: string
   hazards: string[]
@@ -10,8 +8,8 @@ export interface MsdsItem {
   reception: string[]
   laws: string[]
   warningSymbols: string[]
-  warningSymbolsData?: WarningSymbol[]
-  protectiveEquipmentData?: ProtectiveEquipment[]
+  warningSymbolsData?: WarningSymbol[] // 실제 경고 표지 데이터
+  protectiveEquipmentData?: ProtectiveEquipment[] // 실제 보호 장구 데이터
   qrCode?: string
 }
 
