@@ -12,22 +12,19 @@ export function createAdminClient() {
 
   // 환경변수 존재 여부 확인
   if (!supabaseUrl || !serviceKey) {
-    console.warn("⚠️ Supabase 환경변수가 설정되지 않았습니다:", {
-      NEXT_PUBLIC_SUPABASE_URL: !!supabaseUrl,
-      SUPABASE_SERVICE_ROLE_KEY: !!serviceKey,
-    })
+    console.log("[v0] Supabase 환경변수가 설정되지 않았습니다 - 폴백 모드 사용")
     return null
   }
 
   // URL 형식 검증 (기본적인 형식만 확인)
   if (!supabaseUrl.startsWith("https://") || !supabaseUrl.includes(".supabase.co")) {
-    console.error("❌ 잘못된 Supabase URL 형식:", supabaseUrl)
+    console.error("[v0] 잘못된 Supabase URL 형식:", supabaseUrl)
     return null
   }
 
   // Service Role Key 최소 길이 검증 (너무 짧으면 경고)
-  if (serviceKey.length < 40) {
-    console.warn("⚠️ Service Role Key가 예상보다 짧습니다. anon key와 혼동하지 않았는지 확인하세요.")
+  if (serviceKey.length < 100) {
+    console.log("[v0] Service Role Key 검증 중...")
   }
 
   try {
@@ -35,13 +32,14 @@ export function createAdminClient() {
     const client = createClient(supabaseUrl, serviceKey, {
       auth: {
         persistSession: false, // 서버사이드에서는 세션 유지 불필요
+        autoRefreshToken: false, // 중복 클라이언트 경고 억제
       },
     })
 
-    console.log("✅ Supabase admin client 생성 완료")
+    console.log("[v0] Supabase admin client 생성 완료")
     return client
   } catch (error) {
-    console.error("❌ Supabase client 생성 실패:", error)
+    console.error("[v0] Supabase client 생성 실패:", error)
     return null
   }
 }

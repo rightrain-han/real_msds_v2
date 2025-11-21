@@ -5,10 +5,18 @@ import { DEFAULT_PROTECTIVE_EQUIPMENT } from "@/types/msds"
 export async function GET() {
   try {
     const supabase = createAdminClient()
-    if (!supabase) throw new Error("Supabase disabled in preview")
+
+    if (!supabase) {
+      console.log("[v0] Protective-equipment API: Supabase disabled, using defaults")
+      return NextResponse.json(DEFAULT_PROTECTIVE_EQUIPMENT)
+    }
 
     const { data, error } = await supabase.from("protective_equipment").select("*").order("name", { ascending: true })
-    if (error) throw error
+
+    if (error) {
+      console.warn("[v0] Protective-equipment API error, using defaults:", error.message)
+      return NextResponse.json(DEFAULT_PROTECTIVE_EQUIPMENT)
+    }
 
     const formatted = data.map((e) => ({
       id: e.id,
@@ -20,7 +28,7 @@ export async function GET() {
     }))
     return NextResponse.json(formatted)
   } catch (err) {
-    console.warn("Protective-equipment API fallback → defaults", err)
+    console.warn("[v0] Protective-equipment API fallback → defaults", err)
     return NextResponse.json(DEFAULT_PROTECTIVE_EQUIPMENT)
   }
 }

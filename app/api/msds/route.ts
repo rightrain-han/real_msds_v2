@@ -1,17 +1,21 @@
 import { NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase-admin"
-// JSON 파일을 정적 import 하면 Next.js가 번들에 포함합니다.
 import localMsdsData from "@/public/data/msds-data.json"
 
 export async function GET() {
   try {
     const supabase = createAdminClient()
 
-    // Supabase 설정이 없는 v0 미리보기라면 createAdminClient() 가
-    // null 을 던지므로 여기로 jump 합니다.
-    if (!supabase) throw new Error("Supabase disabled in preview")
+    if (!supabase) {
+      console.log("[v0] MSDS API: Supabase disabled, using static JSON")
+      const fallbackData = localMsdsData.map((item) => ({
+        ...item,
+        warningSymbolsData: [],
+        protectiveEquipmentData: [],
+      }))
+      return NextResponse.json(fallbackData)
+    }
 
-    // MSDS 기본 정보와 관련 데이터를 조인하여 조회
     const { data: msdsItems, error } = await supabase
       .from("msds_items")
       .select(`
@@ -22,7 +26,15 @@ export async function GET() {
       `)
       .order("id", { ascending: true })
 
-    if (error) throw error
+    if (error) {
+      console.warn("[v0] MSDS API error, using static JSON:", error.message)
+      const fallbackData = localMsdsData.map((item) => ({
+        ...item,
+        warningSymbolsData: [],
+        protectiveEquipmentData: [],
+      }))
+      return NextResponse.json(fallbackData)
+    }
 
     // 경고 표지와 보호 장구 정보를 별도로 조회
     const [warningSymbolsResponse, protectiveEquipmentResponse] = await Promise.all([
@@ -86,13 +98,11 @@ export async function GET() {
       }
     })
 
-    console.log("✅ MSDS API: Loaded", enrichedItems.length, "items with enriched data")
+    console.log("[v0] MSDS API: Loaded", enrichedItems.length, "items with enriched data")
     return NextResponse.json(enrichedItems)
   } catch (err) {
-    // 최종 fallback – 정적 JSON (개발·프리뷰 환경용)
-    console.warn("MSDS API fallback → static json", err)
+    console.warn("[v0] MSDS API fallback → static json", err)
 
-    // 폴백 데이터에도 빈 배열로 초기화하여 에러 방지
     const fallbackData = localMsdsData.map((item) => ({
       ...item,
       warningSymbolsData: [],

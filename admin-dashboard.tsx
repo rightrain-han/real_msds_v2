@@ -52,6 +52,15 @@ const initialFormData: FormData = {
   warningSymbols: [],
 }
 
+const fallbackConfigOptions: ConfigOption[] = [
+  { id: 1, type: "usage", value: "pure_reagent", label: "순수시약", is_active: true },
+  { id: 2, type: "usage", value: "nox_reduction", label: "NOx저감", is_active: true },
+  { id: 3, type: "reception", value: "lng_3_cpp", label: "LNG 3호기 CPP", is_active: true },
+  { id: 4, type: "reception", value: "water_treatment", label: "수처리동", is_active: true },
+  { id: 5, type: "laws", value: "chemical_safety", label: "화학물질안전법", is_active: true },
+  { id: 6, type: "laws", value: "industrial_safety", label: "산업안전보건법", is_active: true },
+]
+
 export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [msdsItems, setMsdsItems] = useState<MsdsItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -206,66 +215,80 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
   const loadWarningSymbols = async () => {
     try {
-      const response = await fetch("/api/warning-symbols")
-      if (response.ok) {
-        const data = await response.json()
+      console.log("[v0] Loading warning symbols...")
+      const response = await fetch("/api/warning-symbols", { cache: "no-store" })
+
+      if (!response.ok) {
+        console.warn(`[v0] Warning symbols API returned ${response.status}, using defaults`)
+        return
+      }
+
+      const text = await response.text()
+      try {
+        const data = JSON.parse(text)
+        console.log("[v0] Warning symbols loaded:", data.length, "items")
         setWarningSymbols(data)
+      } catch (parseError) {
+        console.error("[v0] Warning symbols JSON parse error:", parseError)
+        console.error("[v0] Response text was:", text.substring(0, 200))
       }
     } catch (error) {
-      console.error("Error loading warning symbols:", error)
+      console.error("[v0] Warning symbols API error, using defaults:", error)
     }
   }
 
   const loadProtectiveEquipment = async () => {
     try {
-      const response = await fetch("/api/protective-equipment")
-      if (response.ok) {
-        const data = await response.json()
+      console.log("[v0] Loading protective equipment...")
+      const response = await fetch("/api/protective-equipment", { cache: "no-store" })
+
+      if (!response.ok) {
+        console.warn(`[v0] Protective equipment API returned ${response.status}, using defaults`)
+        return
+      }
+
+      const text = await response.text()
+      try {
+        const data = JSON.parse(text)
+        console.log("[v0] Protective equipment loaded:", data.length, "items")
         setProtectiveEquipment(data)
+      } catch (parseError) {
+        console.error("[v0] Protective equipment JSON parse error:", parseError)
+        console.error("[v0] Response text was:", text.substring(0, 200))
       }
     } catch (error) {
-      console.error("Error loading protective equipment:", error)
+      console.error("[v0] Protective equipment API error, using defaults:", error)
     }
   }
 
   const loadConfigOptions = async () => {
     try {
-      console.log("🔧 [admin] Loading config options...")
+      console.log("🔧 [v0] Loading config options...")
       const response = await fetch("/api/config-options", { cache: "no-store" })
 
-      console.log("🔧 [admin] Config options response status:", response.status)
+      console.log("🔧 [v0] Config options response status:", response.status)
 
       if (response.ok) {
-        const data = await response.json()
-        console.log("🔧 [admin] Config options loaded:", data.length, "items")
-        console.log("🔧 [admin] Config options data:", data)
-        setConfigOptions(data)
+        const text = await response.text()
+        try {
+          const data = JSON.parse(text)
+          console.log("🔧 [v0] Config options loaded:", data.length, "items")
+          setConfigOptions(data)
+          return
+        } catch (parseError) {
+          console.error("🔧 [v0] Config options JSON parse error:", parseError)
+          console.error("🔧 [v0] Response text was:", text.substring(0, 200))
+        }
       } else {
-        console.error("🔧 [admin] Config options API failed:", response.status, response.statusText)
-        // 기본 데이터로 폴백
-        const defaultConfig = [
-          { id: 1, type: "usage", value: "pure_reagent", label: "순수시약", is_active: true },
-          { id: 2, type: "usage", value: "nox_reduction", label: "NOx저감", is_active: true },
-          { id: 3, type: "reception", value: "lng_3_cpp", label: "LNG 3호기 CPP", is_active: true },
-          { id: 4, type: "reception", value: "water_treatment", label: "수처리동", is_active: true },
-          { id: 5, type: "laws", value: "chemical_safety", label: "화학물질안전법", is_active: true },
-          { id: 6, type: "laws", value: "industrial_safety", label: "산업안전보건법", is_active: true },
-        ]
-        console.log("🔧 [admin] Using fallback config data")
-        setConfigOptions(defaultConfig)
+        console.error("🔧 [v0] Config options API failed:", response.status, response.statusText)
       }
+
+      console.log("🔧 [v0] Using fallback config data")
+      setConfigOptions(fallbackConfigOptions)
     } catch (error) {
-      console.error("🔧 [admin] Error loading config options:", error)
-      // 에러 발생 시에도 기본 데이터 제공
-      const defaultConfig = [
-        { id: 1, type: "usage", value: "pure_reagent", label: "순수시약", is_active: true },
-        { id: 2, type: "usage", value: "nox_reduction", label: "NOx저감", is_active: true },
-        { id: 3, type: "reception", value: "lng_3_cpp", label: "LNG 3호기 CPP", is_active: true },
-        { id: 4, type: "reception", value: "water_treatment", label: "수처리동", is_active: true },
-        { id: 5, type: "laws", value: "chemical_safety", label: "화학물질안전법", is_active: true },
-        { id: 6, type: "laws", value: "industrial_safety", label: "산업안전보건법", is_active: true },
-      ]
-      setConfigOptions(defaultConfig)
+      console.error("🔧 [v0] Error loading config options:", error)
+      console.log("🔧 [v0] Using fallback config data")
+      setConfigOptions(fallbackConfigOptions)
     }
   }
 
@@ -604,7 +627,13 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
 
           {/* 모바일에서는 버튼들을 세로로 배치 */}
           <div className={`flex ${isMobile ? "flex-col gap-2" : "flex-wrap gap-2"}`}>
-            <Button onClick={handleRefresh} variant="outline" size="sm" disabled={refreshing} className="flex-1">
+            <Button
+              onClick={handleRefresh}
+              variant="outline"
+              size="sm"
+              disabled={refreshing}
+              className="flex-1 bg-transparent"
+            >
               <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
               새로고침
             </Button>
@@ -730,7 +759,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                                 variant="outline"
                                 size={isMobile ? "default" : "sm"}
                                 disabled={uploading}
-                                className="w-full flex items-center justify-center gap-2"
+                                className="w-full flex items-center justify-center gap-2 bg-transparent"
                               >
                                 <Upload className="h-4 w-4" />
                                 {uploading ? "업로드중" : "PDF 업로드"}

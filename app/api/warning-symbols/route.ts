@@ -5,12 +5,19 @@ import { DEFAULT_WARNING_SYMBOLS } from "@/types/msds"
 export async function GET() {
   try {
     const supabase = createAdminClient()
-    if (!supabase) throw new Error("Supabase disabled in preview")
+
+    if (!supabase) {
+      console.log("[v0] Warning-symbols API: Supabase disabled, using defaults")
+      return NextResponse.json(DEFAULT_WARNING_SYMBOLS)
+    }
 
     const { data, error } = await supabase.from("warning_symbols").select("*").order("name", { ascending: true })
-    if (error) throw error
 
-    // 필드명 변환
+    if (error) {
+      console.warn("[v0] Warning-symbols API error, using defaults:", error.message)
+      return NextResponse.json(DEFAULT_WARNING_SYMBOLS)
+    }
+
     const formatted = data.map((s) => ({
       id: s.id,
       name: s.name,
@@ -21,7 +28,7 @@ export async function GET() {
     }))
     return NextResponse.json(formatted)
   } catch (err) {
-    console.warn("Warning-symbols API fallback → defaults", err)
+    console.warn("[v0] Warning-symbols API fallback → defaults", err)
     return NextResponse.json(DEFAULT_WARNING_SYMBOLS)
   }
 }
