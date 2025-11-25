@@ -10,12 +10,18 @@ export function createAdminClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-  console.log("[v0] 환경 변수 확인:")
+  console.log("[v0] 🔍 환경 변수 상세 확인:")
   console.log(
     "[v0] - NEXT_PUBLIC_SUPABASE_URL:",
     supabaseUrl ? `설정됨 (${supabaseUrl.substring(0, 30)}...)` : "❌ 없음",
   )
-  console.log("[v0] - SUPABASE_SERVICE_ROLE_KEY:", serviceKey ? `설정됨 (길이: ${serviceKey.length})` : "❌ 없음")
+  if (serviceKey) {
+    console.log(`[v0] - SUPABASE_SERVICE_ROLE_KEY: 설정됨 (길이: ${serviceKey.length})`)
+    console.log(`[v0]   키 시작: "${serviceKey.substring(0, 10)}..."`)
+    console.log(`[v0]   키 끝: "...${serviceKey.substring(serviceKey.length - 10)}"`)
+  } else {
+    console.log("[v0] - SUPABASE_SERVICE_ROLE_KEY: ❌ 없음")
+  }
 
   // 환경변수 존재 여부 확인
   if (!supabaseUrl || !serviceKey) {
@@ -30,9 +36,24 @@ export function createAdminClient() {
     return null
   }
 
-  // Service Role Key 최소 길이 검증 (너무 짧으면 경고)
-  if (serviceKey.length < 100) {
-    console.warn("[v0] ⚠️ Service Role Key가 예상보다 짧습니다. anon key와 혼동하지 않았는지 확인하세요.")
+  // Service Role Key 형식 검증
+  const isNewFormat = serviceKey.startsWith("sb_secret_")
+  const isLegacyFormat = serviceKey.startsWith("eyJ")
+
+  if (!isNewFormat && !isLegacyFormat) {
+    console.error("[v0] ❌ Service Role Key 형식이 올바르지 않습니다.")
+    console.error("[v0]    'sb_secret_'로 시작하거나 'eyJ'로 시작해야 합니다.")
+    return null
+  }
+
+  if (isNewFormat && serviceKey.length < 40) {
+    console.error("[v0] ❌ Service Role Key가 너무 짧습니다. 전체 키를 복사했는지 확인하세요.")
+    return null
+  }
+
+  if (isLegacyFormat && serviceKey.length < 100) {
+    console.error("[v0] ❌ Service Role Key가 너무 짧습니다. 전체 JWT 토큰을 복사했는지 확인하세요.")
+    return null
   }
 
   try {
