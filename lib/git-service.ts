@@ -4,79 +4,79 @@
  */
 
 export interface GitRepository {
-  name: string;
-  full_name: string;
-  description: string;
-  html_url: string;
-  created_at: string;
-  updated_at: string;
-  pushed_at: string;
-  size: number;
-  stargazers_count: number;
-  watchers_count: number;
-  forks_count: number;
-  open_issues_count: number;
-  default_branch: string;
-  language: string;
+  name: string
+  full_name: string
+  description: string
+  html_url: string
+  created_at: string
+  updated_at: string
+  pushed_at: string
+  size: number
+  stargazers_count: number
+  watchers_count: number
+  forks_count: number
+  open_issues_count: number
+  default_branch: string
+  language: string
 }
 
 export interface GitCommit {
-  sha: string;
+  sha: string
   commit: {
     author: {
-      name: string;
-      email: string;
-      date: string;
-    };
-    message: string;
-  };
+      name: string
+      email: string
+      date: string
+    }
+    message: string
+  }
   author: {
-    login: string;
-    avatar_url: string;
-  } | null;
-  html_url: string;
+    login: string
+    avatar_url: string
+  } | null
+  html_url: string
 }
 
 export interface GitBranch {
-  name: string;
+  name: string
   commit: {
-    sha: string;
-    url: string;
-  };
-  protected: boolean;
+    sha: string
+    url: string
+  }
+  protected: boolean
 }
 
 export interface GitContributor {
-  login: string;
-  avatar_url: string;
-  contributions: number;
-  html_url: string;
+  login: string
+  avatar_url: string
+  contributions: number
+  html_url: string
 }
 
 export interface GitLanguages {
-  [key: string]: number;
+  [key: string]: number
 }
 
 /**
  * GitHub API 기본 설정
  */
-const GITHUB_API_BASE = 'https://api.github.com';
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || process.env.NEXT_PUBLIC_GITHUB_TOKEN;
+const GITHUB_API_BASE = "https://api.github.com"
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN
 
 /**
  * API 요청 헤더 생성
  */
 function getHeaders(): HeadersInit {
   const headers: HeadersInit = {
-    'Accept': 'application/vnd.github.v3+json',
-    'Content-Type': 'application/json',
-  };
-
-  if (GITHUB_TOKEN) {
-    headers['Authorization'] = `Bearer ${GITHUB_TOKEN}`;
+    Accept: "application/vnd.github.v3+json",
+    "Content-Type": "application/json",
   }
 
-  return headers;
+  if (GITHUB_TOKEN) {
+    headers["Authorization"] = `Bearer ${GITHUB_TOKEN}`
+  }
+
+  return headers
 }
 
 /**
@@ -85,17 +85,17 @@ function getHeaders(): HeadersInit {
 export function parseRepoUrl(repoUrl: string): { owner: string; repo: string } | null {
   try {
     // https://github.com/owner/repo.git 형식
-    const match = repoUrl.match(/github\.com[\/:]([^\/]+)\/([^\/\.]+)(\.git)?$/);
+    const match = repoUrl.match(/github\.com[/:]([^/]+)\/([^/.]+)(\.git)?$/)
     if (match) {
       return {
         owner: match[1],
-        repo: match[2]
-      };
+        repo: match[2],
+      }
     }
-    return null;
+    return null
   } catch (error) {
-    console.error('Failed to parse repo URL:', error);
-    return null;
+    console.error("Failed to parse repo URL:", error)
+    return null
   }
 }
 
@@ -105,46 +105,38 @@ export function parseRepoUrl(repoUrl: string): { owner: string; repo: string } |
 export async function getRepositoryInfo(owner: string, repo: string): Promise<GitRepository> {
   const response = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}`, {
     headers: getHeaders(),
-    next: { revalidate: 300 } // 5분 캐시
-  });
+    next: { revalidate: 300 }, // 5분 캐시
+  })
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch repository info: ${response.statusText}`);
+    throw new Error(`Failed to fetch repository info: ${response.statusText}`)
   }
 
-  return response.json();
+  return response.json()
 }
 
 /**
  * 최근 커밋 목록 조회
  */
-export async function getRecentCommits(
-  owner: string,
-  repo: string,
-  branch?: string,
-  limit: number = 10
-): Promise<GitCommit[]> {
+export async function getRecentCommits(owner: string, repo: string, branch?: string, limit = 10): Promise<GitCommit[]> {
   const params = new URLSearchParams({
     per_page: limit.toString(),
-  });
+  })
 
   if (branch) {
-    params.append('sha', branch);
+    params.append("sha", branch)
   }
 
-  const response = await fetch(
-    `${GITHUB_API_BASE}/repos/${owner}/${repo}/commits?${params}`,
-    {
-      headers: getHeaders(),
-      next: { revalidate: 60 } // 1분 캐시
-    }
-  );
+  const response = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}/commits?${params}`, {
+    headers: getHeaders(),
+    next: { revalidate: 60 }, // 1분 캐시
+  })
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch commits: ${response.statusText}`);
+    throw new Error(`Failed to fetch commits: ${response.statusText}`)
   }
 
-  return response.json();
+  return response.json()
 }
 
 /**
@@ -153,14 +145,14 @@ export async function getRecentCommits(
 export async function getBranches(owner: string, repo: string): Promise<GitBranch[]> {
   const response = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}/branches`, {
     headers: getHeaders(),
-    next: { revalidate: 300 } // 5분 캐시
-  });
+    next: { revalidate: 300 }, // 5분 캐시
+  })
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch branches: ${response.statusText}`);
+    throw new Error(`Failed to fetch branches: ${response.statusText}`)
   }
 
-  return response.json();
+  return response.json()
 }
 
 /**
@@ -169,14 +161,14 @@ export async function getBranches(owner: string, repo: string): Promise<GitBranc
 export async function getContributors(owner: string, repo: string): Promise<GitContributor[]> {
   const response = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}/contributors`, {
     headers: getHeaders(),
-    next: { revalidate: 3600 } // 1시간 캐시
-  });
+    next: { revalidate: 3600 }, // 1시간 캐시
+  })
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch contributors: ${response.statusText}`);
+    throw new Error(`Failed to fetch contributors: ${response.statusText}`)
   }
 
-  return response.json();
+  return response.json()
 }
 
 /**
@@ -185,14 +177,14 @@ export async function getContributors(owner: string, repo: string): Promise<GitC
 export async function getLanguages(owner: string, repo: string): Promise<GitLanguages> {
   const response = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}/languages`, {
     headers: getHeaders(),
-    next: { revalidate: 3600 } // 1시간 캐시
-  });
+    next: { revalidate: 3600 }, // 1시간 캐시
+  })
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch languages: ${response.statusText}`);
+    throw new Error(`Failed to fetch languages: ${response.statusText}`)
   }
 
-  return response.json();
+  return response.json()
 }
 
 /**
@@ -201,14 +193,14 @@ export async function getLanguages(owner: string, repo: string): Promise<GitLang
 export async function getCommit(owner: string, repo: string, sha: string): Promise<GitCommit> {
   const response = await fetch(`${GITHUB_API_BASE}/repos/${owner}/${repo}/commits/${sha}`, {
     headers: getHeaders(),
-    next: { revalidate: 3600 } // 1시간 캐시
-  });
+    next: { revalidate: 3600 }, // 1시간 캐시
+  })
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch commit: ${response.statusText}`);
+    throw new Error(`Failed to fetch commit: ${response.statusText}`)
   }
 
-  return response.json();
+  return response.json()
 }
 
 /**
@@ -221,8 +213,8 @@ export async function getRepositoryDashboardData(owner: string, repo: string) {
       getRecentCommits(owner, repo, undefined, 10),
       getBranches(owner, repo),
       getContributors(owner, repo),
-      getLanguages(owner, repo)
-    ]);
+      getLanguages(owner, repo),
+    ])
 
     return {
       repository: repoInfo,
@@ -230,10 +222,10 @@ export async function getRepositoryDashboardData(owner: string, repo: string) {
       branches,
       contributors,
       languages,
-      success: true
-    };
+      success: true,
+    }
   } catch (error) {
-    console.error('Failed to fetch repository dashboard data:', error);
+    console.error("Failed to fetch repository dashboard data:", error)
     return {
       repository: null,
       commits: [],
@@ -241,7 +233,7 @@ export async function getRepositoryDashboardData(owner: string, repo: string) {
       contributors: [],
       languages: {},
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
-    };
+      error: error instanceof Error ? error.message : "Unknown error",
+    }
   }
 }
